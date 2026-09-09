@@ -3,377 +3,255 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Task Board — How It Works</title>
+<title>Task Board — End-to-End Flow Guide</title>
 <style>
   :root{
-    --bg:#f6f7f9;
-    --paper:#ffffff;
-    --ink:#161b22;
-    --ink-soft:#4b5563;
-    --ink-faint:#8a93a1;
-    --line:#e2e5ea;
-    --line-strong:#cdd2db;
-    --teal:#0f6e62;
-    --teal-tint:#e7f2f0;
-    --teal-line:#bcdad4;
-    --indigo:#3a3f8f;
-    --indigo-tint:#eceeff;
-    --indigo-line:#c8cbf2;
-    --amber:#a15c0a;
-    --amber-tint:#fbf0df;
-    --amber-line:#e6c98f;
-    --red:#9c2b23;
-    --red-tint:#fbeceb;
+    --bg:#f5f7fa;--paper:#fff;--ink:#111827;--soft:#4b5563;--faint:#8b95a5;
+    --line:#e2e8f0;--line2:#cbd5e1;--teal:#0f766e;--teal-bg:#ecfdf5;
+    --indigo:#4338ca;--indigo-bg:#eef2ff;--amber:#b45309;--amber-bg:#fff7ed;
+    --red:#b91c1c;--red-bg:#fef2f2;--blue:#0369a1;--blue-bg:#f0f9ff;
+    --green:#15803d;--green-bg:#f0fdf4;--slate-bg:#f8fafc;
   }
   *{box-sizing:border-box}
   html{scroll-behavior:smooth}
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Inter',system-ui,-apple-system,Segoe UI,Arial,sans-serif;
-    line-height:1.6;
-    font-size:16px;
-  }
-  h1,h2,h3,h4{font-family:'Fraunces','Iowan Old Style',Georgia,serif;font-weight:600;margin:0 0 .5em;color:var(--ink)}
-  p{margin:0 0 1em;max-width:70ch;color:var(--ink-soft)}
-  a{color:var(--teal)}
-  code{
-    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-    background:#eef0f4;border:1px solid var(--line-strong);border-radius:4px;
-    padding:1px 6px;font-size:.86em;color:var(--ink);
-  }
-
-  /* ---------- shell ---------- */
-  .topbar{
-    position:sticky;top:0;z-index:20;
-    background:rgba(246,247,249,.92);backdrop-filter:blur(6px);
-    border-bottom:1px solid var(--line);
-  }
-  .topbar-inner{
-    max-width:1080px;margin:0 auto;padding:14px 28px;
-    display:flex;align-items:center;justify-content:space-between;gap:24px;
-  }
-  .brand{font-family:'Fraunces',Georgia,serif;font-weight:600;font-size:17px;letter-spacing:.2px}
-  .brand span{color:var(--teal)}
-  nav.toc{display:flex;gap:20px;flex-wrap:wrap}
-  nav.toc a{
-    color:var(--ink-soft);text-decoration:none;font-size:14px;font-weight:500;
-    border-bottom:2px solid transparent;padding-bottom:2px;
-  }
-  nav.toc a:hover{border-bottom-color:var(--teal-line);color:var(--ink)}
-
-  main{max-width:1080px;margin:0 auto;padding:0 28px 100px}
-
-  /* ---------- hero ---------- */
-  .hero{padding:64px 0 40px;border-bottom:1px solid var(--line);margin-bottom:56px}
-  .hero .kicker{color:var(--teal);font-weight:600;font-size:14px;margin-bottom:14px}
-  .hero h1{font-size:40px;line-height:1.15;max-width:16ch;margin-bottom:20px}
-  .hero p.lead{font-size:18px;max-width:60ch;color:var(--ink-soft)}
-  .hero-facts{
-    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
-    background:var(--line);border:1px solid var(--line);border-radius:10px;
-    overflow:hidden;margin-top:32px;max-width:720px;
-  }
-  .hero-facts div{background:var(--paper);padding:16px 18px}
-  .hero-facts .k{font-size:13px;color:var(--ink-faint);margin-bottom:4px}
-  .hero-facts .v{font-size:15px;font-weight:600}
-
-  section{margin-bottom:64px;scroll-margin-top:80px}
-  .section-head{display:flex;align-items:baseline;gap:14px;margin-bottom:22px}
-  .section-head h2{font-size:26px;margin:0}
-  .section-head .idx{font-size:14px;color:var(--ink-faint);font-variant-numeric:tabular-nums}
-
-  /* ---------- lifecycle diagram ---------- */
-  .cycle{
-    display:grid;grid-template-columns:repeat(5,1fr);gap:0;
-    border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--paper);
-  }
-  .cycle .stage{padding:22px 18px;border-right:1px solid var(--line);position:relative}
-  .cycle .stage:last-child{border-right:none}
-  .cycle .stage .tag{font-size:12px;color:var(--ink-faint);margin-bottom:10px}
-  .cycle .stage h4{font-size:15px;margin-bottom:6px}
-  .cycle .stage p{font-size:13.5px;margin:0;max-width:none}
-  .cycle .stage::after{
-    content:"→";position:absolute;right:-11px;top:26px;color:var(--ink-faint);
-    background:var(--paper);width:20px;text-align:center;font-size:14px;
-  }
-  .cycle .stage:last-child::after{content:""}
-  @media (max-width:820px){
-    .cycle{grid-template-columns:1fr}
-    .cycle .stage{border-right:none;border-bottom:1px solid var(--line)}
-    .cycle .stage::after{content:"↓";right:auto;left:18px;top:auto;bottom:-11px}
-    .cycle .stage:last-child{border-bottom:none}
-  }
-
-  /* ---------- role panels ---------- */
-  .role-head{
-    display:flex;align-items:center;gap:12px;margin-bottom:6px;
-  }
-  .role-badge{
-    font-size:12px;font-weight:700;letter-spacing:.3px;padding:4px 10px;border-radius:6px;
-  }
-  .role-badge.coord{background:var(--teal-tint);color:var(--teal);border:1px solid var(--teal-line)}
-  .role-badge.admin{background:var(--indigo-tint);color:var(--indigo);border:1px solid var(--indigo-line)}
-  .role-sub{color:var(--ink-faint);font-size:14px}
-
-  .flow{margin-top:28px;border-left:2px solid var(--line);padding-left:0}
-  .flow-step{display:grid;grid-template-columns:34px 1fr;gap:16px;padding:0 0 26px 0;position:relative}
-  .flow-step:last-child{padding-bottom:0}
-  .flow-step .dot{
-    width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    font-size:14px;font-weight:700;margin-left:-18px;background:var(--paper);border:2px solid var(--teal);color:var(--teal);
-  }
-  .flow.admin .flow-step .dot{border-color:var(--indigo);color:var(--indigo)}
-  .flow-step h4{font-size:16px;margin-bottom:4px}
-  .flow-step p{margin-bottom:0;font-size:14.5px}
-
-  /* ---------- lanes ---------- */
-  .lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
-  .lane{border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--paper)}
-  .lane h4{font-size:14.5px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-  .lane .dotc{width:9px;height:9px;border-radius:50%}
-  .lane.p1 .dotc{background:var(--red)}
-  .lane.p2 .dotc{background:var(--amber)}
-  .lane.cap .dotc{background:var(--ink-faint)}
-  .lane p{font-size:13.5px;margin:0}
-  @media (max-width:760px){.lanes{grid-template-columns:1fr}}
-
-  /* ---------- signal chips ---------- */
-  .chipset{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
-  .chip{
-    font-size:13px;padding:6px 12px;border-radius:999px;background:var(--paper);
-    border:1px solid var(--line-strong);color:var(--ink-soft);
-  }
-
-  /* ---------- tables ---------- */
-  table{width:100%;border-collapse:collapse;margin-top:6px;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  thead th{
-    text-align:left;font-size:12.5px;text-transform:none;color:var(--ink-faint);
-    font-weight:600;padding:12px 16px;border-bottom:1px solid var(--line);background:#fafbfc;
-  }
-  tbody td{padding:13px 16px;border-bottom:1px solid var(--line);font-size:14.5px;vertical-align:top;color:var(--ink-soft)}
-  tbody tr:last-child td{border-bottom:none}
-  tbody td:first-child{color:var(--ink);font-weight:600}
-
-  /* ---------- tabs reference ---------- */
-  .tabcards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
-  .tabcard{border:1px solid var(--line);border-radius:10px;padding:18px;background:var(--paper)}
-  .tabcard h4{font-size:15px;margin-bottom:8px}
-  .tabcard p{font-size:14px;margin:0}
-  @media (max-width:760px){.tabcards{grid-template-columns:1fr}}
-
-  /* ---------- callouts ---------- */
-  .note{border:1px solid var(--teal-line);background:var(--teal-tint);border-radius:10px;padding:16px 18px;margin-top:20px}
-  .note.amber{border-color:var(--amber-line);background:var(--amber-tint)}
-  .note p{margin:0;color:var(--ink)}
-  .note p + p{margin-top:8px}
-  .note strong{font-weight:700}
-
-  /* ---------- permissions ---------- */
-  .perm-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px}
-  @media (max-width:700px){.perm-grid{grid-template-columns:1fr}}
-  .perm{border:1px solid var(--line);border-radius:10px;padding:16px 18px;background:var(--paper)}
-  .perm code{display:block;width:fit-content;margin-bottom:8px}
-  .perm p{font-size:14px;margin:0}
-
-  /* ---------- faq ---------- */
-  .faq{border-top:1px solid var(--line)}
-  .faq-item{border-bottom:1px solid var(--line);padding:18px 0}
-  .faq-item h4{font-size:15.5px;margin-bottom:6px}
-  .faq-item p{margin:0;font-size:14.5px}
-
-  footer{border-top:1px solid var(--line);padding:28px 0;color:var(--ink-faint);font-size:13px}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;line-height:1.55;font-size:15.5px}
+  h1,h2,h3,h4{margin:0;color:var(--ink);line-height:1.25}
+  h1{font-size:42px;letter-spacing:-1.1px}
+  h2{font-size:27px;letter-spacing:-.35px}
+  h3{font-size:19px}
+  h4{font-size:15px}
+  p{margin:.45rem 0 0;color:var(--soft)}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:#eef2f7;border:1px solid var(--line2);padding:1px 6px;border-radius:5px;font-size:.88em;color:#1f2937}
+  strong{color:var(--ink)}
+  .topbar{position:sticky;top:0;z-index:30;background:rgba(245,247,250,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .topbar-inner{max-width:1180px;margin:auto;padding:13px 26px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .brand{font-weight:800;font-size:16px}.brand span{color:var(--teal)}
+  nav{display:flex;gap:16px;flex-wrap:wrap;justify-content:flex-end}
+  nav a{font-size:13px;color:var(--soft);text-decoration:none;font-weight:600}
+  nav a:hover{color:var(--teal)}
+  main{max-width:1180px;margin:auto;padding:0 26px 90px}
+  section{margin:0 0 66px;scroll-margin-top:82px}
+  .hero{padding:66px 0 42px;border-bottom:1px solid var(--line);margin-bottom:54px}
+  .eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+  .hero h1{max-width:850px}.hero .lead{font-size:18px;max-width:850px;margin-top:16px}
+  .hero-facts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:30px}
+  .fact{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:15px 16px}
+  .fact .k{font-size:12px;color:var(--faint);font-weight:700}.fact .v{font-size:15px;font-weight:800;margin-top:4px}
+  .section-head{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+  .idx{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#e6f3f1;color:var(--teal);font-size:12px;font-weight:800;flex:0 0 auto}
+  .sublead{max-width:900px;margin-bottom:22px}
+  .problem{display:grid;grid-template-columns:1fr 64px 1fr;align-items:stretch;gap:14px}
+  .problem-card{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:20px}
+  .problem-card.before{border-top:4px solid var(--amber)}.problem-card.after{border-top:4px solid var(--teal)}
+  .problem-arrow{display:flex;align-items:center;justify-content:center;font-size:28px;color:var(--faint)}
+  .mini-list{margin:12px 0 0;padding-left:18px;color:var(--soft)}.mini-list li{margin:6px 0}
+  .master-flow{display:grid;grid-template-columns:repeat(6,1fr);background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .master-step{padding:18px 15px;min-height:150px;border-right:1px solid var(--line);position:relative}
+  .master-step:last-child{border-right:0}.master-step:not(:last-child)::after{content:"→";position:absolute;right:-11px;top:28px;width:20px;text-align:center;background:var(--paper);color:var(--faint);z-index:2}
+  .master-step .num{font-size:11px;font-weight:800;color:var(--faint);margin-bottom:9px}.master-step h4{margin-bottom:6px}.master-step p{font-size:13px}
+  .phase-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}
+  .phase{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:20px}
+  .phase.a{border-left:5px solid var(--blue)}.phase.b{border-left:5px solid var(--indigo)}
+  .phase .tag{display:inline-block;font-size:11px;font-weight:800;border-radius:999px;padding:4px 8px;margin-bottom:10px}.phase.a .tag{background:var(--blue-bg);color:var(--blue)}.phase.b .tag{background:var(--indigo-bg);color:var(--indigo)}
+  .ownership{display:grid;grid-template-columns:1fr 52px 1fr 52px 1fr;align-items:center;gap:10px;margin-top:18px}
+  .node{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;text-align:center;min-height:112px;display:flex;flex-direction:column;justify-content:center}.node .small{font-size:12px;color:var(--faint);font-weight:700;margin-bottom:5px}.node .big{font-weight:800}.arrow{text-align:center;color:var(--faint);font-size:25px}
+  .callout{margin-top:18px;border-radius:11px;padding:15px 17px;border:1px solid #bae6fd;background:var(--blue-bg)}
+  .callout.warn{border-color:#fed7aa;background:var(--amber-bg)}.callout.good{border-color:#bbf7d0;background:var(--green-bg)}.callout p{margin:0;color:#273444}
+  .timing-grid{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+  .timing-card{background:var(--paper);border:1px solid var(--line);border-radius:13px;padding:20px}
+  .timing-card.nightly{border-top:4px solid var(--indigo)}.timing-card.realtime{border-top:4px solid var(--red)}
+  .timing-badge{display:inline-block;border-radius:999px;padding:4px 9px;font-size:11px;font-weight:800;margin-bottom:9px}.nightly .timing-badge{background:var(--indigo-bg);color:var(--indigo)}.realtime .timing-badge{background:var(--red-bg);color:var(--red)}
+  .triggers{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+  .trigger{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:16px;position:relative}.trigger .n{position:absolute;right:12px;top:10px;font-size:11px;color:var(--faint);font-weight:800}.trigger h4{padding-right:28px}.trigger p{font-size:13.5px}.trigger.rt{border-top:3px solid var(--red)}
+  .lanes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.lane{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px}.lane.p1{border-top:4px solid var(--red)}.lane.p23{border-top:4px solid var(--amber)}.lane.cap{border-top:4px solid #64748b}.lane .examples{margin:10px 0 0;padding-left:18px;color:var(--soft);font-size:13px}.lane .examples li{margin:5px 0}
+  .metrics{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.metric{border:1px solid var(--line2);background:var(--paper);border-radius:999px;padding:7px 11px;font-size:12.5px;font-weight:700;color:var(--soft)}
+  .action-flow{display:grid;grid-template-columns:1fr;gap:0;margin-top:12px;border-left:2px solid var(--line);margin-left:17px}.action-step{display:grid;grid-template-columns:36px 1fr;gap:14px;padding-bottom:22px}.action-step:last-child{padding-bottom:0}.dot{width:36px;height:36px;border-radius:50%;margin-left:-19px;background:var(--paper);border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--teal)}.action-step p{font-size:14px}
+  .outcomes{display:grid;grid-template-columns:1fr 1fr;gap:14px}.outcome{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px}.outcome.ok{border-left:5px solid var(--green)}.outcome.rnr{border-left:5px solid var(--amber)}
+  .flowline{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}.pill{font-size:12px;border-radius:999px;padding:6px 9px;background:var(--slate-bg);border:1px solid var(--line);font-weight:700;color:var(--soft)}.flowline .fa{color:var(--faint)}
+  .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.tab{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:17px}.tab h4{margin-bottom:5px}
+  .admin-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.admin-item{background:var(--paper);border:1px solid var(--line);border-radius:11px;padding:16px}.admin-item .n{font-size:11px;color:var(--indigo);font-weight:800;margin-bottom:6px}.admin-item p{font-size:13px}
+  table{width:100%;border-collapse:separate;border-spacing:0;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden}th{background:#f8fafc;color:var(--faint);font-size:12px;text-align:left;padding:11px 13px;border-bottom:1px solid var(--line)}td{padding:12px 13px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--soft);font-size:13.5px}tbody tr:last-child td{border-bottom:0}td:first-child{font-weight:800;color:var(--ink)}
+  .faq{border-top:1px solid var(--line)}.faq-item{padding:17px 0;border-bottom:1px solid var(--line)}.faq-item p{font-size:14px;max-width:1000px}
+  .legend{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 18px}.legend span{font-size:12px;font-weight:700;border-radius:999px;padding:5px 9px}.lg-night{background:var(--indigo-bg);color:var(--indigo)}.lg-real{background:var(--red-bg);color:var(--red)}.lg-owner{background:var(--teal-bg);color:var(--teal)}
+  footer{border-top:1px solid var(--line);padding:26px 0;color:var(--faint);font-size:13px}
+  @media(max-width:980px){.hero-facts{grid-template-columns:repeat(2,1fr)}.master-flow{grid-template-columns:repeat(3,1fr)}.master-step:nth-child(3){border-right:0}.master-step:nth-child(n+4){border-top:1px solid var(--line)}.master-step::after{display:none}.triggers{grid-template-columns:repeat(2,1fr)}.admin-grid{grid-template-columns:repeat(2,1fr)}.ownership{grid-template-columns:1fr}.ownership .arrow{transform:rotate(90deg)}.timing-grid{grid-template-columns:1fr}}
+  @media(max-width:700px){h1{font-size:34px}.topbar-inner{align-items:flex-start;flex-direction:column}.hero{padding-top:42px}.hero-facts,.phase-wrap,.lanes,.outcomes,.tabs,.triggers,.admin-grid,.problem{grid-template-columns:1fr}.problem-arrow{transform:rotate(90deg)}.master-flow{grid-template-columns:1fr}.master-step{border-right:0;border-top:1px solid var(--line)}.master-step:first-child{border-top:0}}
 </style>
 </head>
 <body>
-
-<div class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">Zen<span>Class</span> · Task Board</div>
-    <nav class="toc">
-      <a href="javascript:void(0)" data-target="what">What it is</a>
-      <a href="javascript:void(0)" data-target="cycle">The daily cycle</a>
-      <a href="javascript:void(0)" data-target="coordinator">Coordinator</a>
-      <a href="javascript:void(0)" data-target="admin">Admin</a>
-      <a href="javascript:void(0)" data-target="actions">Actions</a>
-      <a href="javascript:void(0)" data-target="access">Access</a>
-      <a href="javascript:void(0)" data-target="faq">FAQ</a>
-    </nav>
-  </div>
-</div>
-
+<div class="topbar"><div class="topbar-inner"><div class="brand">Zen<span>Class</span> · Task Board</div><nav>
+<a href="#overview">Overview</a><a href="#lifecycle">Lifecycle</a><a href="#ownership">Ownership</a><a href="#triggers">Triggers</a><a href="#coordinator">Coordinator</a><a href="#outcome">Outcome</a><a href="#admin">Admin</a><a href="#faq">FAQ</a>
+</nav></div></div>
 <main>
-
-  <div class="hero">
-    <div class="kicker">User guide</div>
-    <h1>The Task Board, end to end</h1>
-    <p class="lead">A working guide to what the Task Board does, how a task moves from a learner signal to a closed call, and exactly what a coordinator and an admin each do inside it.</p>
+  <div class="hero" id="overview">
+    <div class="eyebrow">End-to-end working guide</div>
+    <h1>Task Board flow — from learner signal to completed follow-up</h1>
+    <p class="lead">The Task Board converts learner follow-up signals into a single prioritized daily queue. This guide makes the generation flow, ownership, real-time tasks, coordinator actions, Exotel outcomes, RNR handling, exclusions, escalations, and admin controls explicit.</p>
     <div class="hero-facts">
-      <div><div class="k">Built for</div><div class="v">Zenclass programs</div></div>
-      <div><div class="k">Rebuilds</div><div class="v">Nightly, 03:15 IST</div></div>
-      <div><div class="k">Call engine</div><div class="v">Exotel, task-linked</div></div>
+      <div class="fact"><div class="k">Scope</div><div class="v">Zenclass programs only</div></div>
+      <div class="fact"><div class="k">Regular build</div><div class="v">Nightly · 03:15 IST</div></div>
+      <div class="fact"><div class="k">Ownership</div><div class="v">batches.mainCoordinator</div></div>
+      <div class="fact"><div class="k">Call outcome</div><div class="v">Exotel webhook → task update</div></div>
     </div>
   </div>
 
-  <section id="what">
-    <div class="section-head"><span class="idx">01</span><h2>What the Task Board is</h2></div>
-    <p>Every coordinator is responsible for a set of learners — the batches where they're listed as the <code>mainCoordinator</code>. Those learners drift in and out of states that need a phone call: a welcome call that hasn't happened yet, a CCT check-in that's due, a learner who's gone quiet on Flexi, a placement follow-up, a missed inbound call that needs calling back. Today, spotting all of that meant checking several places by hand.</p>
-    <p>The Task Board watches those signals for you. Each night it looks across every learner a coordinator owns, works out who needs a call and why, and lays it out as a single ranked queue for the next day. Coordinators work the queue; admins watch it across the whole team, step in on anything stuck, and tune how the board behaves.</p>
-    <div class="chipset">
-      <span class="chip">Welcome call</span>
-      <span class="chip">CCT follow-up</span>
-      <span class="chip">15-day / fortnightly check-in</span>
-      <span class="chip">Attendance drop</span>
-      <span class="chip">Placement follow-up</span>
-      <span class="chip">Flexi non-engagement</span>
-      <span class="chip">Live-eval gap</span>
-      <span class="chip">Missed inbound callback</span>
-      <span class="chip">Manual callback</span>
-    </div>
-    <div class="note">
-      <p><strong>Scope.</strong> The Task Board is switched on for Zenclass programs only — it doesn't appear for B2B or B2I business units.</p>
+  <section>
+    <div class="section-head"><span class="idx">01</span><h2>Why the Task Board exists</h2></div>
+    <div class="problem">
+      <div class="problem-card before"><h3>Before</h3><p>Coordinator had to manually inspect several places to find learners who needed follow-up.</p><ul class="mini-list"><li>Welcome call due</li><li>CCT follow-up</li><li>Attendance / Flexi inactivity</li><li>Placement follow-up</li><li>Missed calls & callbacks</li></ul></div>
+      <div class="problem-arrow">→</div>
+      <div class="problem-card after"><h3>With Task Board</h3><p>Those signals are evaluated and converted into one ranked queue for the responsible coordinator.</p><ul class="mini-list"><li>One daily working queue</li><li>Urgent tasks surfaced first</li><li>Task-linked call outcomes</li><li>History stays attached to the task</li><li>Admin can oversee the full team</li></ul></div>
     </div>
   </section>
 
-  <section id="cycle">
-    <div class="section-head"><span class="idx">02</span><h2>The daily cycle</h2></div>
-    <p>A task's life runs in one direction, from a signal on a learner's record to a closed call in a coordinator's history. This is the shape of it, every day.</p>
-    <div class="cycle">
-      <div class="stage">
-        <div class="tag">Overnight</div>
-        <h4>Signals detected</h4>
-        <p>The board checks every owned learner against welcome, CCT, attendance, placement, Flexi and live-eval rules, plus Exotel's missed-call log.</p>
-      </div>
-      <div class="stage">
-        <div class="tag">03:15 IST</div>
-        <h4>Board built</h4>
-        <p>Tasks are created or updated per coordinator and sorted into priority lanes. Any missed run is caught up the next time the app boots.</p>
-      </div>
-      <div class="stage">
-        <div class="tag">During the day</div>
-        <h4>Coordinator works it</h4>
-        <p>Calls, completes, reschedules, or hands off tasks from their board — see the Coordinator walkthrough below.</p>
-      </div>
-      <div class="stage">
-        <div class="tag">On each call</div>
-        <h4>Outcome logged</h4>
-        <p>Connected calls close the task. No-answers count toward RNR. Everything is tied back to the exact task, not just the learner.</p>
-      </div>
-      <div class="stage">
-        <div class="tag">Ongoing</div>
-        <h4>Admin oversight</h4>
-        <p>Escalations, team load, and trends stay visible to admins, who can retune the rules or trigger a rebuild at any time.</p>
-      </div>
+  <section id="lifecycle">
+    <div class="section-head"><span class="idx">02</span><h2>The complete lifecycle</h2></div>
+    <p class="sublead">Think of the system as six connected stages. Regular tasks enter through the nightly worker; selected urgent callbacks can enter in real time.</p>
+    <div class="legend"><span class="lg-night">Nightly flow</span><span class="lg-real">Real-time insertion</span><span class="lg-owner">Coordinator ownership</span></div>
+    <div class="master-flow">
+      <div class="master-step"><div class="num">STEP 1</div><h4>Sync learner state</h4><p><code>SyncLearnerStates</code> maps batch ownership and refreshes the learner state used by the board engine.</p></div>
+      <div class="master-step"><div class="num">STEP 2</div><h4>Evaluate triggers</h4><p>The engine checks each learner against welcome, CCT, fortnightly, attendance, placement, Flexi and live-eval rules.</p></div>
+      <div class="master-step"><div class="num">STEP 3</div><h4>Create / update tasks</h4><p><code>BuildCoordinator</code> creates deterministic tasks with dedupe protection instead of producing duplicate cards.</p></div>
+      <div class="master-step"><div class="num">STEP 4</div><h4>Prioritize board</h4><p>Tasks are distributed into Priority 1, Priority 2–3 and Over Cap, with top metric cards for quick load visibility.</p></div>
+      <div class="master-step"><div class="num">STEP 5</div><h4>Coordinator acts</h4><p>Call, complete, reschedule, schedule callback, set preferred time, do-not-call, or escalate.</p></div>
+      <div class="master-step"><div class="num">STEP 6</div><h4>Outcome updates state</h4><p>Exotel or a manual action updates the exact task, RNR state and follow-up clocks; admin handles escalated work.</p></div>
+    </div>
+
+    <div class="phase-wrap">
+      <div class="phase a"><span class="tag">PHASE A · 03:15 IST</span><h3>SyncLearnerStates</h3><p>Find the learners owned through each batch's <code>mainCoordinator</code>, then sync the learner state used for task evaluation. If ownership changes, the next sync is the point where open work can follow the new owner.</p></div>
+      <div class="phase b"><span class="tag">PHASE B · AFTER SYNC</span><h3>BuildCoordinator</h3><p>Evaluate deterministic trigger rules, dedupe existing tasks, construct the coordinator queue, calculate lane distribution and populate the top summary cards.</p></div>
+    </div>
+    <div class="callout"><p><strong>Missed nightly run?</strong> If the 03:15 run was missed because the app was down, <code>CatchUpOnBoot</code> can rebuild today's board when the worker boots.</p></div>
+  </section>
+
+  <section id="ownership">
+    <div class="section-head"><span class="idx">03</span><h2>Who owns a learner's task?</h2></div>
+    <p class="sublead">Task Board ownership is batch-based. This is the first thing to verify when a learner appears on the wrong board or does not appear at all.</p>
+    <div class="ownership">
+      <div class="node"><div class="small">SOURCE</div><div class="big">Batch</div><p><code>batches.mainCoordinator</code></p></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="small">OWNER</div><div class="big">Coordinator</div><p>Coordinator owns that batch for Task Board purposes.</p></div>
+      <div class="arrow">→</div>
+      <div class="node"><div class="small">BOARD SCOPE</div><div class="big">Batch learners</div><p>Their eligible follow-up tasks appear on that coordinator's board.</p></div>
+    </div>
+    <div class="callout good"><p><strong>Important:</strong> Task Board ownership does <strong>not</strong> use <code>users.callerHash</code>. If a student changes batch or the batch's main coordinator changes, the next learner-state sync is what realigns ownership.</p></div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="idx">04</span><h2>When tasks appear</h2></div>
+    <div class="timing-grid">
+      <div class="timing-card nightly"><span class="timing-badge">REGULAR · NIGHTLY</span><h3>Most proactive tasks are built at 03:15 IST</h3><p>Nightly worker runs the learner-state sync followed by board construction for coordinators. Regular trigger evaluation happens here.</p><div class="metrics"><span class="metric">Welcome</span><span class="metric">CCT</span><span class="metric">15-day</span><span class="metric">Attendance</span><span class="metric">Placement</span><span class="metric">Flexi</span><span class="metric">Live-eval</span></div></div>
+      <div class="timing-card realtime"><span class="timing-badge">REAL-TIME · PRIORITY 1</span><h3>Two urgent cases do not wait for night</h3><p><strong>Missed Inbound Callback</strong> and a learner-requested <strong>same-day Manual Callback</strong> can be inserted into the board immediately.</p></div>
+    </div>
+  </section>
+
+  <section id="triggers">
+    <div class="section-head"><span class="idx">05</span><h2>All task triggers</h2></div>
+    <p class="sublead">Nine trigger categories feed the board. The first seven are regular proactive signals; the last two are callback-oriented and can be time-critical.</p>
+    <div class="triggers">
+      <div class="trigger"><span class="n">01</span><h4>Welcome Call</h4><p>New batch learner needs a welcome call within the first two working days.</p></div>
+      <div class="trigger"><span class="n">02</span><h4>CCT Push Call</h4><p>CCT follow-up occurrences inside the 45-day window, including Day 12, 24, 35 and 45 pushes.</p></div>
+      <div class="trigger"><span class="n">03</span><h4>15-Day Fortnightly</h4><p>Golden-rule proactive follow-up when there has been no proactive contact for 15 working days.</p></div>
+      <div class="trigger"><span class="n">04</span><h4>Attendance Inactivity</h4><p>Mainboot learner is repeatedly absent and needs a follow-up call.</p></div>
+      <div class="trigger"><span class="n">05</span><h4>Placement Follow-Up</h4><p>Learner is in pre-placement or main-placement follow-up scope.</p></div>
+      <div class="trigger"><span class="n">06</span><h4>Flexi Non-Engagement</h4><p>Flexi learner has remained inactive without expected content engagement.</p></div>
+      <div class="trigger"><span class="n">07</span><h4>Live Evaluation Gap</h4><p>A submitted project has remained without evaluation beyond the configured gap.</p></div>
+      <div class="trigger rt"><span class="n">08</span><h4>Learner-Requested Callback</h4><p>Coordinator schedules a callback requested by the learner. Same-day callbacks can appear immediately.</p></div>
+      <div class="trigger rt"><span class="n">09</span><h4>Missed Inbound Callback</h4><p>A learner's inbound call was missed and needs a same-day return call.</p></div>
     </div>
   </section>
 
   <section id="coordinator">
-    <div class="role-head">
-      <span class="role-badge coord">COORDINATOR</span>
-      <span class="role-sub">Owns the learners in their mainCoordinator batches</span>
-    </div>
-    <h2 style="margin-top:14px">Working the board</h2>
-    <p>A coordinator's day starts on the <strong>Board</strong> tab. It's a single queue, split into three lanes so the most time-sensitive calls surface first.</p>
-
+    <div class="section-head"><span class="idx">06</span><h2>What the coordinator sees and does</h2></div>
+    <h3 style="margin-bottom:12px">A. Board lanes</h3>
     <div class="lanes">
-      <div class="lane p1"><h4><span class="dotc"></span>Priority 1</h4><p>Time-critical: welcome calls close to their deadline, RNR retries, and missed-inbound callbacks owed the same day.</p></div>
-      <div class="lane p2"><h4><span class="dotc"></span>Priority 2–3</h4><p>Due but not urgent: CCT and fortnightly check-ins, Flexi and live-eval gaps, placement follow-ups.</p></div>
-      <div class="lane cap"><h4><span class="dotc"></span>Over cap</h4><p>Tasks that didn't fit today's calling capacity and rolled over. History is preserved, nothing is lost.</p></div>
+      <div class="lane p1"><h3>Priority 1</h3><p>Time-sensitive work that should be handled first.</p><ul class="examples"><li>Welcome window closing</li><li>Missed inbound callbacks</li><li>RNR retries</li><li>Same-day callback work</li></ul></div>
+      <div class="lane p23"><h3>Priority 2–3</h3><p>Due proactive work that is important but less urgent.</p><ul class="examples"><li>CCT push</li><li>15-day follow-up</li><li>Flexi non-engagement</li><li>Placement follow-up</li><li>Live-eval gap</li></ul></div>
+      <div class="lane cap"><h3>Over Cap</h3><p>Work above today's effective calling capacity.</p><ul class="examples"><li>Preserved safely</li><li>Rolls over</li><li>History is not lost</li></ul></div>
+    </div>
+    <div class="metrics"><span class="metric">Welcome due</span><span class="metric">CCT push</span><span class="metric">15-day due</span><span class="metric">RNR / missed</span><span class="metric">Flexi at-risk</span></div>
+
+    <h3 style="margin:30px 0 14px">B. Daily working flow</h3>
+    <div class="action-flow">
+      <div class="action-step"><div class="dot">1</div><div><h4>Scan top cards and Priority 1</h4><p>Understand where the day's load is concentrated before opening individual tasks.</p></div></div>
+      <div class="action-step"><div class="dot">2</div><div><h4>Search / filter the queue</h4><p>Work by learner, batch, task type, RNR, priority or rollover category.</p></div></div>
+      <div class="action-step"><div class="dot">3</div><div><h4>Open learner call detail</h4><p>Review learner context, recent calls, CCT/RNR timing, activity and existing notes.</p></div></div>
+      <div class="action-step"><div class="dot">4</div><div><h4>Call from Task Board</h4><p>Click-to-call sends the task identity with the Exotel flow so the callback outcome can update the exact task.</p></div></div>
+      <div class="action-step"><div class="dot">5</div><div><h4>Or take a manual action</h4><p><strong>Complete</strong>, <strong>Reschedule</strong>, <strong>Schedule Callback</strong>, or save a <strong>Preferred Call Window</strong> depending on what the learner needs.</p></div></div>
+      <div class="action-step"><div class="dot">6</div><div><h4>Handle exceptions</h4><p>Use <strong>Do Not Call</strong> to suppress contact, or <strong>Escalate</strong> when admin intervention is required.</p></div></div>
     </div>
 
-    <div class="flow">
-      <div class="flow-step"><div class="dot">1</div><div><h4>Scan the top cards</h4><p>The board opens with counts for welcome-due, CCT push, 15-day due, RNR/missed, and Flexi at-risk, so you know where today's load is concentrated before diving in.</p></div></div>
-      <div class="flow-step"><div class="dot">2</div><div><h4>Search or filter</h4><p>Find a specific learner or batch, or filter the queue down to a task type — Priority 1, RNR retries, rolled-over tasks — when you want to work in one category at a time.</p></div></div>
-      <div class="flow-step"><div class="dot">3</div><div><h4>Open a call detail</h4><p>Click a learner's name to see their info, recent calls, where they stand on CCT/RNR timing, activity history, and prior comments — everything you need before you dial.</p></div></div>
-      <div class="flow-step"><div class="dot">4</div><div><h4>Make the call</h4><p><strong>Call</strong> from the row or the detail page places the call through Exotel and tags it with the task, so the outcome closes the right task automatically — no manual matching.</p></div></div>
-      <div class="flow-step"><div class="dot">5</div><div><h4>Log the outcome</h4><p>Connected and resolved → the task closes itself once the outcome comes back. Talked to the learner outside Exotel (WhatsApp, personal phone)? Mark it <strong>Complete</strong> yourself. Need more time? <strong>Reschedule</strong> to a later date without losing the task's history.</p></div></div>
-      <div class="flow-step"><div class="dot">6</div><div><h4>Handle the exceptions</h4><p>Learner asked to be called at a specific time — set a <strong>preferred call window</strong> or <strong>schedule a callback</strong>. Learner shouldn't be contacted — mark <strong>do not call</strong>, which moves them to Excluded. Stuck or needs admin's input — <strong>escalate</strong>, and it moves off your board into the admin queue.</p></div></div>
-    </div>
-
-    <h3 style="margin-top:32px;font-size:18px">The other two tabs</h3>
-    <div class="tabcards">
-      <div class="tabcard"><h4>Board</h4><p>Your working queue for today, sorted into the three lanes above.</p></div>
-      <div class="tabcard"><h4>Excluded</h4><p>Learners currently suppressed from calling — suspended, on hold, marked do-not-call, past CCT sunset, or without a coordinator. If the reason is do-not-call, you can re-enable calls from here.</p></div>
-      <div class="tabcard"><h4>Escalated</h4><p>Calls you've sent to admin. Read-only while admin owns them, and they don't count toward your cap or roll over while escalated.</p></div>
-    </div>
-  </section>
-
-  <section id="admin">
-    <div class="role-head">
-      <span class="role-badge admin">ADMIN</span>
-      <span class="role-sub">Oversees every coordinator's board and tunes how it behaves</span>
-    </div>
-    <h2 style="margin-top:14px">Running the program</h2>
-    <p>Admins don't work individual calls day to day — their view is the team, the queue health, and the rules that generate tasks in the first place.</p>
-
-    <div class="flow admin">
-      <div class="flow-step"><div class="dot">1</div><div><h4>Check the Dashboard</h4><p>Total learners in scope, calls completed, team capacity, breaches, coordinators on leave, and trend charts over time — the health of the whole program at a glance.</p></div></div>
-      <div class="flow-step"><div class="dot">2</div><div><h4>Clear Escalations</h4><p>See what's open, what got resolved today, and what got sent back. On any escalated call, you can <strong>Call</strong> it yourself, <strong>Resolve</strong> it, or <strong>Return</strong> it to the coordinator.</p></div></div>
-      <div class="flow-step"><div class="dot">3</div><div><h4>Review Coordinators</h4><p>A coordinator-wise table you can search, sort, and export. Click a coordinator to drill into their board exactly as they see it — useful for spot checks or coaching.</p></div></div>
-      <div class="flow-step"><div class="dot">4</div><div><h4>Adjust Settings</h4><p>Change calling caps, CCT and welcome-call windows, RNR rules, working hours, and Flexi/live-eval thresholds. Anything you change here shapes what the next board build generates.</p></div></div>
-      <div class="flow-step"><div class="dot">5</div><div><h4>Rebuild when needed</h4><p>Trigger <strong>Rebuild Today's Boards</strong> after a settings change, or whenever boards need refreshing outside the nightly run. Give it a few minutes to finish before checking a coordinator's board.</p></div></div>
-    </div>
-
-    <div class="note amber">
-      <p><strong>Escalations don't sit idle.</strong> Every escalated task stays visible on the admin Escalations screen until it's resolved or returned — nothing disappears once a coordinator hands it off.</p>
+    <h3 style="margin:30px 0 12px">C. Three coordinator tabs</h3>
+    <div class="tabs">
+      <div class="tab"><h4>Board</h4><p>Today's working queue, including Priority 1, Priority 2–3 and Over Cap.</p></div>
+      <div class="tab"><h4>Excluded</h4><p>Suppressed learners such as <code>disableCall</code>, on-hold or other excluded states. Do-not-call suppresses open tasks.</p></div>
+      <div class="tab"><h4>Escalated</h4><p>Tasks handed to admin. They are locked/read-only for the coordinator until resolved or returned.</p></div>
     </div>
   </section>
 
-  <section id="actions">
-    <div class="section-head"><span class="idx">03</span><h2>Actions, at a glance</h2></div>
+  <section id="outcome">
+    <div class="section-head"><span class="idx">07</span><h2>What happens after a call?</h2></div>
+    <div class="outcomes">
+      <div class="outcome ok"><h3>Connected</h3><p>When the Task Board call connects and the Exotel outcome returns, the exact task can close automatically. The 15-day proactive clock resets and the RNR counter resets.</p><div class="flowline"><span class="pill">Call from Task Board</span><span class="fa">→</span><span class="pill">Exotel outcome</span><span class="fa">→</span><span class="pill">Task done</span><span class="fa">→</span><span class="pill">RNR = 0</span></div></div>
+      <div class="outcome rnr"><h3>No Answer / Busy</h3><p>The failed attempt is recorded in the RNR flow. The next attempt can rotate to another slot; after repeated attempts the learner can move into cooldown.</p><div class="flowline"><span class="pill">No answer / busy</span><span class="fa">→</span><span class="pill">RNR +1</span><span class="fa">→</span><span class="pill">Slot rotation</span><span class="fa">→</span><span class="pill">3 attempts → cooldown</span></div></div>
+    </div>
+    <div class="callout warn"><p><strong>Manual completion:</strong> If the learner was contacted outside Task Board / Exotel (for example WhatsApp or personal phone), the coordinator can use <strong>Complete</strong> with a note. This was verified to mark the task done and reset the 15-day clock.</p></div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="idx">08</span><h2>Deduplication, reschedule and security</h2></div>
     <table>
-      <thead><tr><th>Action</th><th>Who</th><th>What it does</th></tr></thead>
+      <thead><tr><th>Case</th><th>Expected behavior</th></tr></thead>
       <tbody>
-        <tr><td>Call</td><td>Coordinator</td><td>Places the call through Exotel with the task attached, so the outcome closes or updates the exact task.</td></tr>
-        <tr><td>Complete</td><td>Coordinator</td><td>Closes a task by hand when the conversation happened outside Exotel.</td></tr>
-        <tr><td>Reschedule</td><td>Coordinator</td><td>Moves the same task to a later date. History stays attached — nothing restarts from zero.</td></tr>
-        <tr><td>Schedule callback</td><td>Coordinator</td><td>Pins a learner-requested callback; a same-day one appears on the board right away.</td></tr>
-        <tr><td>Preferred call window</td><td>Coordinator</td><td>Saves a learner's preferred time to be called, for future tasks.</td></tr>
-        <tr><td>Do not call</td><td>Coordinator</td><td>Suppresses open tasks and moves the learner to Excluded.</td></tr>
-        <tr><td>Escalate</td><td>Coordinator</td><td>Sends the task to the admin queue; it becomes read-only on the coordinator's board.</td></tr>
-        <tr><td>Resolve / Return</td><td>Admin</td><td>Closes an escalation, or sends it back to the coordinator's board.</td></tr>
-        <tr><td>Rebuild Today's Boards</td><td>Admin</td><td>Regenerates every coordinator's board immediately, using current settings.</td></tr>
+        <tr><td>Board rebuild runs again</td><td>Deterministic <code>dedupeKey</code> handling prevents the same logical task from being created again.</td></tr>
+        <tr><td>Another proactive trigger exists</td><td>Open proactive work is deduped / preempted so the learner is not flooded with multiple competing proactive cards.</td></tr>
+        <tr><td>Reschedule</td><td>The same task moves to the later date and keeps its history rather than restarting from zero.</td></tr>
+        <tr><td>Do Not Call</td><td>Open tasks for that learner are suppressed and the learner moves into the Excluded flow.</td></tr>
+        <tr><td>Non-owner tries an action</td><td>Backend ownership checks prevent a coordinator from completing or editing another coordinator's learner task.</td></tr>
       </tbody>
     </table>
   </section>
 
-  <section id="access">
-    <div class="section-head"><span class="idx">04</span><h2>Who can see what</h2></div>
-    <p>Access is permission-based, with one built-in exception: a coordinator who owns at least one <code>mainCoordinator</code> batch sees the Task Board nav even without the view permission explicitly assigned.</p>
-    <div class="perm-grid">
-      <div class="perm"><code>taskBoard.view</code><p>See your own board.</p></div>
-      <div class="perm"><code>taskBoard.edit</code><p>Call, complete, reschedule, schedule callbacks, set availability, mark do-not-call, escalate.</p></div>
-      <div class="perm"><code>taskBoard.adminview</code><p>Team dashboard, escalation queue, coordinators list, and drill-down into any coordinator's board.</p></div>
-      <div class="perm"><code>taskBoard.config</code><p>Settings screen and triggering a rebuild.</p></div>
+  <section id="admin">
+    <div class="section-head"><span class="idx">09</span><h2>Admin flow</h2></div>
+    <p class="sublead">Admins oversee board health rather than working every call directly.</p>
+    <div class="admin-grid">
+      <div class="admin-item"><div class="n">01 · DASHBOARD</div><h4>Monitor health</h4><p>Review team load, completed work, capacity, breaches, leave state and trends.</p></div>
+      <div class="admin-item"><div class="n">02 · ESCALATIONS</div><h4>Resolve or return</h4><p>Call, resolve with notes, or return escalated work to its coordinator.</p></div>
+      <div class="admin-item"><div class="n">03 · COORDINATORS</div><h4>Drill down</h4><p>Inspect coordinator-level workload and view their board for spot checks or coaching.</p></div>
+      <div class="admin-item"><div class="n">04 · SETTINGS</div><h4>Tune rules</h4><p>Adjust caps, windows, RNR rules, working hours and trigger thresholds.</p></div>
+      <div class="admin-item"><div class="n">05 · REBUILD</div><h4>Refresh boards</h4><p>Trigger a rebuild when settings change or a board needs an immediate refresh.</p></div>
     </div>
+  </section>
+
+  <section>
+    <div class="section-head"><span class="idx">10</span><h2>Access and scope</h2></div>
+    <table>
+      <thead><tr><th>Permission / rule</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>taskBoard.view</code></td><td>View own Task Board.</td></tr>
+        <tr><td><code>taskBoard.edit</code></td><td>Perform coordinator task actions such as call, complete, reschedule, callback, availability and escalation.</td></tr>
+        <tr><td><code>taskBoard.adminview</code></td><td>Admin dashboard, coordinator drill-down and escalation management.</td></tr>
+        <tr><td><code>taskBoard.config</code></td><td>Task Board settings and rebuild control.</td></tr>
+        <tr><td>Program scope</td><td>Task Board is intended for Zenclass-category programs; B2B / B2I are outside this flow.</td></tr>
+      </tbody>
+    </table>
   </section>
 
   <section id="faq">
-    <div class="section-head"><span class="idx">05</span><h2>Common questions</h2></div>
+    <div class="section-head"><span class="idx">11</span><h2>Demo-ready Q&A</h2></div>
     <div class="faq">
-      <div class="faq-item"><h4>My board looks empty — is something broken?</h4><p>Probably not. Boards fill after the nightly build or an admin-triggered rebuild — if you were just added as a coordinator or a batch just started, ask an admin to rebuild.</p></div>
-      <div class="faq-item"><h4>I called a learner but the task didn't close.</h4><p>The task only closes automatically when the call was placed from inside the Task Board, so the outcome carries the task ID back with it. A call placed from elsewhere in the app won't be linked — mark it Complete by hand instead.</p></div>
-      <div class="faq-item"><h4>Why can't I edit an escalated call?</h4><p>Once escalated, admin owns it. It stays read-only on your board and doesn't count toward your cap until it's resolved or returned to you.</p></div>
-      <div class="faq-item"><h4>I don't see Task Board in my sidebar at all.</h4><p>Check that the program is a Zenclass business unit (Task Board isn't enabled for B2B/B2I), and that you either hold the view permission or own a mainCoordinator batch.</p></div>
-      <div class="faq-item"><h4>How often does the board refresh?</h4><p>Automatically every night at 03:15 IST. Admins can also force an immediate rebuild from Settings after changing a rule.</p></div>
+      <div class="faq-item"><h4>When exactly is a task created?</h4><p>Regular proactive tasks are generated during the 03:15 IST nightly build. Missed inbound callbacks and same-day learner-requested callbacks can appear in real time without waiting for the nightly run.</p></div>
+      <div class="faq-item"><h4>Which coordinator gets the learner?</h4><p>The Task Board follows <code>batches.mainCoordinator</code>. Learners in that coordinator's owned batches form the source population for the board.</p></div>
+      <div class="faq-item"><h4>Can duplicate tasks appear if the build runs twice?</h4><p>The tested build is idempotent: dedupe keys prevent a repeated build from creating the same logical tasks again.</p></div>
+      <div class="faq-item"><h4>What happens when a coordinator is on leave?</h4><p>When caller activity is disabled, new proactive generation is paused while existing backlog remains preserved. When active again, catch-up mode prioritizes the backlog.</p></div>
+      <div class="faq-item"><h4>Can a coordinator edit another coordinator's task?</h4><p>No. Ownership is validated by the backend for task actions; non-owner completion was verified to be forbidden.</p></div>
+      <div class="faq-item"><h4>Why didn't a called task auto-close?</h4><p>Automatic outcome handling depends on the task-linked Task Board call flow. If contact happened elsewhere, use manual Complete instead.</p></div>
+      <div class="faq-item"><h4>What does RNR do?</h4><p>No-answer / busy increases the RNR state, rotates the next slot, and repeated attempts can move the learner into cooldown.</p></div>
+      <div class="faq-item"><h4>What if the nightly cron is missed?</h4><p><code>CatchUpOnBoot</code> can build today's missing board when the application starts again.</p></div>
     </div>
   </section>
-
 </main>
-
-<footer>
-  <div style="max-width:1080px;margin:0 auto;padding:0 28px">Task Board · Coordinator &amp; Admin guide</div>
-</footer>
-
-<script>
-  document.querySelectorAll('nav.toc a[data-target]').forEach(function(link){
-    link.addEventListener('click', function(e){
-      e.preventDefault();
-      var target = document.getElementById(link.getAttribute('data-target'));
-      if(target){ target.scrollIntoView({behavior:'smooth', block:'start'}); }
-    });
-  });
-</script>
+<footer><div style="max-width:1180px;margin:auto;padding:0 26px">Task Board · End-to-End Coordinator & Admin Flow Guide</div></footer>
 </body>
 </html>
