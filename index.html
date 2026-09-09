@@ -76,11 +76,40 @@
   footer{border-top:1px solid var(--line);padding:26px 0;color:var(--faint);font-size:13px}
   @media(max-width:980px){.hero-facts{grid-template-columns:repeat(2,1fr)}.master-flow{grid-template-columns:repeat(3,1fr)}.master-step:nth-child(3){border-right:0}.master-step:nth-child(n+4){border-top:1px solid var(--line)}.master-step::after{display:none}.triggers{grid-template-columns:repeat(2,1fr)}.admin-grid{grid-template-columns:repeat(2,1fr)}.ownership{grid-template-columns:1fr}.ownership .arrow{transform:rotate(90deg)}.timing-grid{grid-template-columns:1fr}}
   @media(max-width:700px){h1{font-size:34px}.topbar-inner{align-items:flex-start;flex-direction:column}.hero{padding-top:42px}.hero-facts,.phase-wrap,.lanes,.outcomes,.tabs,.triggers,.admin-grid,.problem{grid-template-columns:1fr}.problem-arrow{transform:rotate(90deg)}.master-flow{grid-template-columns:1fr}.master-step{border-right:0;border-top:1px solid var(--line)}.master-step:first-child{border-top:0}}
+
+  /* ---------- verification / demo additions ---------- */
+  .verify-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+  .verify-card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px}
+  .verify-card .status{display:inline-block;font-size:11px;font-weight:900;letter-spacing:.08em;padding:4px 8px;border-radius:999px;background:var(--green-bg);color:var(--green);border:1px solid #bbf7d0;margin-bottom:10px}
+  .verify-card h4{font-size:15px;margin-bottom:6px}.verify-card p{font-size:13.5px}
+  .verify-card ul{margin:10px 0 0 18px;padding:0;color:var(--soft);font-size:13.5px}
+  .verify-card li{margin:4px 0}
+  .proof-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+  .proof{background:var(--slate-bg);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center}
+  .proof .v{font-weight:900;font-size:17px}.proof .k{color:var(--faint);font-size:11.5px;margin-top:3px}
+  .demo-script{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}
+  .demo-card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px;position:relative}
+  .demo-card .step-label{font-size:11px;font-weight:900;color:var(--indigo);letter-spacing:.08em;margin-bottom:8px}
+  .demo-card h3{font-size:17px}.demo-card p{font-size:13.8px}.demo-card ul{margin:10px 0 0 18px;padding:0;color:var(--soft);font-size:13.5px}
+  .demo-card li{margin:5px 0}
+  .leave-flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:12px;align-items:stretch;margin-top:18px}
+  .leave-node{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .leave-node h4{margin-bottom:6px}.leave-node p{font-size:13.5px}
+  .leave-arrow{display:flex;align-items:center;font-size:20px;color:var(--faint)}
+  .qa-answer{margin-top:8px;padding:12px 14px;border-left:3px solid var(--teal);background:var(--teal-bg);border-radius:0 8px 8px 0}
+  .qa-answer p{margin:0;font-size:14px}.qa-answer p+p{margin-top:6px}
+  .dedupe-examples{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .dedupe-examples code{font-size:12px}
+  .seed-note{margin-top:16px;border:1px dashed var(--amber);background:var(--amber-bg);border-radius:10px;padding:14px 16px}
+  .seed-note p{margin:0;font-size:13.8px}
+  @media (max-width:900px){.verify-grid,.demo-script{grid-template-columns:1fr 1fr}.proof-strip{grid-template-columns:1fr 1fr}.leave-flow{grid-template-columns:1fr}.leave-arrow{justify-content:center;transform:rotate(90deg)}}
+  @media (max-width:620px){.verify-grid,.demo-script,.proof-strip{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
 <div class="topbar"><div class="topbar-inner"><div class="brand">Zen<span>Class</span> · Task Board</div><nav>
-<a href="#overview">Overview</a><a href="#lifecycle">Lifecycle</a><a href="#ownership">Ownership</a><a href="#triggers">Triggers</a><a href="#coordinator">Coordinator</a><a href="#outcome">Outcome</a><a href="#admin">Admin</a><a href="#faq">FAQ</a>
+<a href="#overview">Overview</a><a href="#lifecycle">Lifecycle</a><a href="#ownership">Ownership</a><a href="#triggers">Triggers</a><a href="#coordinator">Coordinator</a><a href="#outcome">Outcome</a><a href="#verification">Verification</a><a href="#demo">Demo Flow</a><a href="#admin">Admin</a><a href="#faq">Q&amp;A</a>
 </nav></div></div>
 <main>
   <div class="hero" id="overview">
@@ -203,7 +232,7 @@
     <table>
       <thead><tr><th>Case</th><th>Expected behavior</th></tr></thead>
       <tbody>
-        <tr><td>Board rebuild runs again</td><td>Deterministic <code>dedupeKey</code> handling prevents the same logical task from being created again.</td></tr>
+        <tr><td>Board rebuild runs again</td><td>Deterministic <code>dedupeKey</code> handling prevents the same logical task from being created again.<div class="dedupe-examples"><code>welcome:&lt;studentHash&gt;</code><code>cct:&lt;studentHash&gt;:&lt;occurrence&gt;</code><code>fortnight:&lt;studentHash&gt;:&lt;fortnightIdx&gt;</code></div></td></tr>
         <tr><td>Another proactive trigger exists</td><td>Open proactive work is deduped / preempted so the learner is not flooded with multiple competing proactive cards.</td></tr>
         <tr><td>Reschedule</td><td>The same task moves to the later date and keeps its history rather than restarting from zero.</td></tr>
         <tr><td>Do Not Call</td><td>Open tasks for that learner are suppressed and the learner moves into the Excluded flow.</td></tr>
@@ -212,8 +241,22 @@
     </table>
   </section>
 
+
+  <section id="leave">
+    <div class="section-head"><span class="idx">09</span><h2>Coordinator leave &amp; catch-up behavior</h2></div>
+    <p class="sublead">Coordinator availability changes board generation mode without deleting the existing backlog.</p>
+    <div class="leave-flow">
+      <div class="leave-node"><h4>Active coordinator</h4><p><code>isCallerActive = true</code>. Normal proactive task generation and daily board work continue.</p></div>
+      <div class="leave-arrow">→</div>
+      <div class="leave-node"><h4>On Leave</h4><p><code>isCallerActive = false</code>. New proactive generation pauses, while already-open tasks and backlog remain preserved.</p></div>
+      <div class="leave-arrow">→</div>
+      <div class="leave-node"><h4>Active again</h4><p>The board can move into catch-up behavior so preserved backlog is prioritized and worked down instead of being lost.</p></div>
+    </div>
+    <div class="callout"><p><strong>Separate from cron catch-up:</strong> <code>CatchUpOnBoot</code> handles a missed nightly board build; coordinator catch-up handles preserved work after leave.</p></div>
+  </section>
+
   <section id="admin">
-    <div class="section-head"><span class="idx">09</span><h2>Admin flow</h2></div>
+    <div class="section-head"><span class="idx">10</span><h2>Admin flow</h2></div>
     <p class="sublead">Admins oversee board health rather than working every call directly.</p>
     <div class="admin-grid">
       <div class="admin-item"><div class="n">01 · DASHBOARD</div><h4>Monitor health</h4><p>Review team load, completed work, capacity, breaches, leave state and trends.</p></div>
@@ -224,8 +267,36 @@
     </div>
   </section>
 
+
+  <section id="verification">
+    <div class="section-head"><span class="idx">11</span><h2>End-to-end verification summary</h2></div>
+    <p class="sublead">The implementation was exercised across backend unit tests, frontend/backend builds, and a full task lifecycle verification.</p>
+    <div class="proof-strip">
+      <div class="proof"><div class="v">PASS</div><div class="k">Task Board engine tests</div></div>
+      <div class="proof"><div class="v">PASS</div><div class="k">Backend Go build</div></div>
+      <div class="proof"><div class="v">PASS</div><div class="k">Frontend bundle build</div></div>
+      <div class="proof"><div class="v">17 = 17</div><div class="k">Repeat-build dedupe check</div></div>
+    </div>
+    <div class="verify-grid">
+      <div class="verify-card"><span class="status">VERIFIED</span><h4>Generation &amp; ownership</h4><p>Batch-based ownership was synced through <code>SyncLearnerStates</code>, then <code>BuildCoordinator</code> generated deterministic tasks for the coordinator.</p><ul><li><code>batches.mainCoordinator</code> mapping</li><li>Learner state sync</li><li>Deterministic trigger evaluation</li><li>No duplicate task on repeat build</li></ul></div>
+      <div class="verify-card"><span class="status">VERIFIED</span><h4>Board behavior</h4><p>The board distribution and coordinator actions were exercised end to end.</p><ul><li>Priority 1 / Priority 2–3 / Over Cap</li><li>Top metric card counts</li><li>Excluded states</li><li>Reschedule keeps history</li><li>Non-owner action blocked</li></ul></div>
+      <div class="verify-card"><span class="status">VERIFIED</span><h4>Outcome &amp; exception flow</h4><p>Call outcomes and exception states update the task lifecycle as expected.</p><ul><li>Connected → task done</li><li>No answer / busy → RNR progression</li><li>Escalate → admin ownership</li><li>Do Not Call → task suppression</li><li>Manual Complete → audit + clock reset</li></ul></div>
+    </div>
+    <div class="seed-note"><p><strong>Seed fixture fix used for E2E testing:</strong> seeded coordinator batches were corrected to include <code>mainCoordinator: coordHash</code> and valid batch membership, so the test data follows the same batch-based ownership model as production logic.</p></div>
+  </section>
+
+  <section id="demo">
+    <div class="section-head"><span class="idx">12</span><h2>How to explain this in a demo</h2></div>
+    <p class="sublead">A simple three-part story keeps the demo clear: the problem, how the board is generated, and what the coordinator does with it.</p>
+    <div class="demo-script">
+      <div class="demo-card"><div class="step-label">PART A · PROBLEM</div><h3>Why we built it</h3><p>Earlier, coordinators had to manually check multiple screens to identify welcome, CCT, inactivity, placement and callback follow-ups.</p><ul><li>Many sources</li><li>No single ordered queue</li><li>Easy to miss urgent work</li></ul></div>
+      <div class="demo-card"><div class="step-label">PART B · AUTOMATION</div><h3>How tasks reach the board</h3><p>At 03:15 IST, the worker syncs learner state, evaluates triggers and builds the prioritized board. Missed inbound and same-day callbacks can arrive immediately.</p><ul><li>Phase A: <code>SyncLearnerStates</code></li><li>Phase B: <code>BuildCoordinator</code></li><li>Catch-up if nightly run was missed</li></ul></div>
+      <div class="demo-card"><div class="step-label">PART C · ACTION</div><h3>How the coordinator works it</h3><p>The coordinator starts from Priority 1, opens learner context, calls through Exotel or takes a manual action, and handles exceptions through DNC or escalation.</p><ul><li>Call / Complete</li><li>Reschedule / Callback</li><li>Preferred call window</li><li>Escalate / Do Not Call</li></ul></div>
+    </div>
+  </section>
+
   <section>
-    <div class="section-head"><span class="idx">10</span><h2>Access and scope</h2></div>
+    <div class="section-head"><span class="idx">13</span><h2>Access and scope</h2></div>
     <table>
       <thead><tr><th>Permission / rule</th><th>Purpose</th></tr></thead>
       <tbody>
@@ -239,19 +310,26 @@
   </section>
 
   <section id="faq">
-    <div class="section-head"><span class="idx">11</span><h2>Demo-ready Q&A</h2></div>
+    <div class="section-head"><span class="idx">14</span><h2>Demo-ready Q&amp;A</h2></div>
     <div class="faq">
-      <div class="faq-item"><h4>When exactly is a task created?</h4><p>Regular proactive tasks are generated during the 03:15 IST nightly build. Missed inbound callbacks and same-day learner-requested callbacks can appear in real time without waiting for the nightly run.</p></div>
-      <div class="faq-item"><h4>Which coordinator gets the learner?</h4><p>The Task Board follows <code>batches.mainCoordinator</code>. Learners in that coordinator's owned batches form the source population for the board.</p></div>
-      <div class="faq-item"><h4>Can duplicate tasks appear if the build runs twice?</h4><p>The tested build is idempotent: dedupe keys prevent a repeated build from creating the same logical tasks again.</p></div>
-      <div class="faq-item"><h4>What happens when a coordinator is on leave?</h4><p>When caller activity is disabled, new proactive generation is paused while existing backlog remains preserved. When active again, catch-up mode prioritizes the backlog.</p></div>
-      <div class="faq-item"><h4>Can a coordinator edit another coordinator's task?</h4><p>No. Ownership is validated by the backend for task actions; non-owner completion was verified to be forbidden.</p></div>
-      <div class="faq-item"><h4>Why didn't a called task auto-close?</h4><p>Automatic outcome handling depends on the task-linked Task Board call flow. If contact happened elsewhere, use manual Complete instead.</p></div>
-      <div class="faq-item"><h4>What does RNR do?</h4><p>No-answer / busy increases the RNR state, rotates the next slot, and repeated attempts can move the learner into cooldown.</p></div>
-      <div class="faq-item"><h4>What if the nightly cron is missed?</h4><p><code>CatchUpOnBoot</code> can build today's missing board when the application starts again.</p></div>
+      <div class="faq-item"><h4>Q1. Exactly when is a task created?</h4><div class="qa-answer"><p><strong>Regular proactive tasks:</strong> daily 03:15 IST nightly worker build.</p><p><strong>Real-time tasks:</strong> Missed Inbound Callback and same-day learner-requested callback do not wait for the night build.</p><p><strong>Missed cron:</strong> <code>CatchUpOnBoot</code> can build today's missing board after the app starts again.</p></div></div>
+
+      <div class="faq-item"><h4>Q2. In which cases is a task created?</h4><div class="qa-answer"><p>There are 9 trigger categories: Welcome Call, CCT Push, 15-Day Fortnightly, Attendance Inactivity, Placement Follow-Up, Flexi Non-Engagement, Live Evaluation Gap, Learner-Requested Callback, and Missed Inbound Callback.</p></div></div>
+
+      <div class="faq-item"><h4>Q3. Which coordinator’s board will a learner appear on?</h4><div class="qa-answer"><p>Ownership is based on <code>batches.mainCoordinator</code>. Learners from the batches where a coordinator is the main coordinator form that coordinator's Task Board scope. <code>users.callerHash</code> is not the Task Board ownership source.</p><p>If the learner changes batch or the batch's main coordinator changes, the next sync realigns open work to the new owner.</p></div></div>
+
+      <div class="faq-item"><h4>Q4. What happens when a coordinator is on leave?</h4><div class="qa-answer"><p>When <code>isCallerActive = false</code>, new proactive generation pauses. Existing open tasks and backlog are preserved. When the coordinator becomes active again, catch-up behavior helps prioritize the backlog.</p></div></div>
+
+      <div class="faq-item"><h4>Q5. Can duplicate tasks be created for the same learner?</h4><div class="qa-answer"><p>Repeated builds are idempotent. Logical tasks use a deterministic <code>dedupeKey</code>, and open proactive work is deduped / preempted so the learner is not flooded with competing proactive cards.</p><div class="dedupe-examples"><code>welcome:&lt;studentHash&gt;</code><code>cct:&lt;studentHash&gt;:&lt;occurrence&gt;</code><code>fortnight:&lt;studentHash&gt;:&lt;fortnightIdx&gt;</code></div></div></div>
+
+      <div class="faq-item"><h4>Q6. What happens after a call is completed?</h4><div class="qa-answer"><p><strong>Connected:</strong> task closes, the 15-day proactive clock resets, and RNR resets.</p><p><strong>No Answer / Busy:</strong> RNR increases, the next attempt can rotate to another slot, and repeated attempts can move the learner into cooldown.</p></div></div>
+
+      <div class="faq-item"><h4>Q7. Is the Task Board available for every Business Unit?</h4><div class="qa-answer"><p>No. This flow is scoped to Zenclass-category programs. B2B / B2I are outside the supported Task Board flow and are blocked by the application's access rules.</p></div></div>
+
+      <div class="faq-item"><h4>Q8. Can a coordinator edit or complete another coordinator’s task?</h4><div class="qa-answer"><p>No. Backend ownership validation is applied to task actions such as complete, reschedule, escalate, manual schedule and availability. Non-owner completion was explicitly verified as forbidden. Admins use <code>taskBoard.adminview</code> for team drill-down and escalation handling.</p></div></div>
     </div>
   </section>
 </main>
-<footer><div style="max-width:1180px;margin:auto;padding:0 26px">Task Board · End-to-End Coordinator & Admin Flow Guide</div></footer>
+<footer><div style="max-width:1180px;margin:auto;padding:0 26px">Task Board · End-to-End Coordinator & Admin Flow Guide · Demo & Verification Edition</div></footer>
 </body>
 </html>
